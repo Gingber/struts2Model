@@ -1,0 +1,28 @@
+1、开发web工程，开发环境:Tomcat6 + Mysql5.0 + MyEclipse
+2、开发技术：struts2 + javabean(jdbc)
+3、开发功能是什么? 简单的增删改查。
+4、建web项目
+5、建单表
+   create table user(id int not null primary key auto_increment,
+   username varchar(20) not null,
+   password varchar(30) not null,
+   age int ,
+   email varchar(30)
+   );
+6、导包，struts.xml,在web.xml文件里配置过滤器
+    <filter>
+		<filter-name>struts2</filter-name>
+		<filter-class>org.apache.struts2.dispatcher.FilterDispatcher</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>struts2</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+7、 针对项目进行分层,建包结构
+8、分析每个功能需要的类或资源文件，以及整个请求过程进行分析。
+9、创建类，及文件，实现功能。
+
+
+
+
+

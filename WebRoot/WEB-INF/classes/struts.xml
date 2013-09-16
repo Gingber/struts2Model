@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="struts2Model" extends="struts-default" >
+		<action name="login" class="com.ascent.action.LoginAction">
+			<result name="success" type="chain">findUserAction</result>
+			<result name="input">/login.jsp</result>
+		</action>
+		<action name="findUserAction" class="com.ascent.action.FindAllUserAction">
+			<result>/listuser.jsp</result>
+			<result name="input">/login.jsp</result>
+		</action>
+		<action name="register" class="com.ascent.action.RegisterAction">
+			<result>/login.jsp</result>
+			<result name="input">/register.jsp</result>
+		</action>
+		<action name="delete" class="com.ascent.action.DeleteUserAction">
+			<result type="chain">findUserAction</result>
+		</action>
+		<action name="update" class="com.ascent.action.FindUserAction">
+			<result>/update.jsp</result>
+		</action>
+		<action name="doupdate" class="com.ascent.action.UpdateUserAction">
+			<result type="chain">findUserAction</result>
+		</action>
+		<action name="logout" class="com.ascent.action.LogoutAction">
+			<result>/login.jsp</result>
+		</action>	
+	</package>
+</struts>
