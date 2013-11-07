@@ -176,7 +176,7 @@ public class Similarity {
 									d = getSimilarity02(mapVector.get(j),
 											mapVector.get(i), j, i);
 
-								if (d > 0.90) {
+								if (d > 0.80) { //œ‡À∆∂»…Ë÷√
 									if (!vecInsert.contains(i)) {
 										vecInsert.add(i);
 									}

@@ -42,6 +42,18 @@ public class DataAccess {
      return con;
   }
   
+  public static Connection getLocalConnection(String url, String user, String pwd){
+	     Connection con=null;
+	     try {
+	      Class.forName(driver);
+	      con = DriverManager.getConnection(url, user, pwd);
+	     }
+	     catch (Exception ex) {
+	    	 ex.printStackTrace();
+	     }
+	     return con;
+	  }
+  
   public static Connection getConnectionByDS(){
 	  Connection con = null;  
 	  try{

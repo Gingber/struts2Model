@@ -102,11 +102,12 @@ public class Twitter {
 		SpecTopic st = new SpecTopic();
 		Vector<Content> SpecContents = st.ChooseTopic(AllContents);
 		
+		long startTime2 = System.currentTimeMillis();   //获取开始时间
 		/**
 		 * 相似或相同推文分类
 		 */
 		Similarity sim = new Similarity();
-		Vector<Content> ClusterContent = sim.SimilarityCluster(SpecContents);	// 相同或相似项进行编号， 并将编号由小到大进行排序
+		Vector<Content> ClusterContent = sim.SimilarityCluster(AllContents);	// 相同或相似项进行编号， 并将编号由小到大进行排序
 		
 		long endTime2 = System.currentTimeMillis();
 		System.out.println("数据相似度计算时间： "+ (endTime2-startTime2) +"ms");
@@ -132,10 +133,22 @@ public class Twitter {
 		}*/
 		
 		
-		/*if (ud.insertUserTop(username)) {
+		if (ud.insertUserTop(username)) {
 			System.out.println("Top K 用户名插入成功!");
 		} else{
 			System.out.println("Top K 用户名插入失败!");
+		}
+		
+		if (ud.insertHotTweet(message)) {
+			System.out.println("Top K 热点推文插入成功!");
+		} else{
+			System.out.println("Top K 热点推文插入失败!");
+		}
+		
+		/*if (ud.insertRetweetTrend(message)) {
+			System.out.println("Top K 推文转发信息插入成功!");
+		} else{
+			System.out.println("Top K 推文转发信息插入失败!");
 		}*/
 		
 		/*WriteTxtFile wtf = new WriteTxtFile();

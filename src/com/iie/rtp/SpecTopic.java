@@ -29,6 +29,7 @@ public class SpecTopic {
 				SpecContent.add((Content)(content.get(i)));				
 			}
 			
+			
 		}
 		//System.out.println("SpecContent = " + SpecContent.size());
 		

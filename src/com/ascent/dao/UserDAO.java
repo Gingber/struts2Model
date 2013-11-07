@@ -4,6 +4,7 @@
 package com.ascent.dao;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,11 +16,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.ascent.javabean.Message;
 import com.ascent.javabean.User;
 import com.ascent.util.DataAccess;
+import com.iie.rtp.Content;
 
 /**
  * @author zy
@@ -171,18 +174,18 @@ public final class UserDAO {
 		
 		try {
 			con = DataAccess.getConnection();
-			pst = con.prepareStatement("SELECT message_id, title, user_id, create_time FROM message LIMIT 0, 100000");
+			pst = con.prepareStatement("SELECT message_id, title, user_id, create_time FROM message Limit 0, 100000");
 			rs = pst.executeQuery();
 			while(rs.next()){
 				String message_id = rs.getString("message_id");
 				String user_name = rs.getString("user_id");
-				//Date create_time = rs.getTimestamp("create_time");
-				String create_time = rs.getString("create_time").toString();
+				Date create_time = rs.getTimestamp("create_time");
+				/*String create_time = rs.getString("create_time").toString();
 				String NormTime = NormTimeFormat(create_time);
-				Date ProTime = sdf.parse(NormTime);
+				Date ProTime = sdf.parse(NormTime);*/
 				String title= rs.getString("title");
-				if (isChinese(title) != 0){
-					message = new Message(message_id, title, user_name, ProTime);
+				if (isChinese(title) > 10){
+					message = new Message(message_id, title, user_name, create_time);
 					messages.add(message);
 				}	
 			}
@@ -208,12 +211,63 @@ public final class UserDAO {
 		Connection con = null ;
 		PreparedStatement pst = null ;
 		try {
-			//Class.forName("com.mysql.jdbc.Driver");
-			//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/strutsmodel","root","hadoop");
-			con = DataAccess.getConnection();
-			pst = con.prepareStatement("insert into usertop9(userTopName) values(?)");
+			Class.forName("com.mysql.jdbc.Driver");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/twitter_api_0424?useUnicode=true&amp;characterEncoding=gb2312","root","hadoop");
+			//con = DataAccess.getConnection();
+			pst = con.prepareStatement("delete from usertop");
+			pst.executeUpdate();
+			
+			pst = con.prepareStatement("insert into usertop(userTopName) values(?)");
 			for (String name : username) {
 				pst.setString(1, name);
+				// 把一个SQL命令加入命令列表  j
+			    pst.addBatch();
+			}
+			// 执行批量更新  
+			pst.executeBatch();    
+			
+		}catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		} finally{
+			try {
+				if(pst!=null){
+					pst.close();
+				}
+				if(con!=null){
+					con.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return true;
+	}
+	
+	public boolean insertHotTweet(Vector<Content> message) throws ClassNotFoundException{
+		
+		Connection con = null ;
+		PreparedStatement pst = null ;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/twitter_api_0424?useUnicode=true&amp;characterEncoding=gb2312","root","hadoop");
+			//con = DataAccess.getConnection();
+			pst = con.prepareStatement("delete from hot_tweet");
+			pst.executeUpdate();
+			
+			pst = con.prepareStatement("insert into hot_tweet(username, retweet, forward, friends, create_time, popularity) values(?,?,?,?,?,?)");
+			int AllRtNum = 0;
+			for (int i = 0; i < message.size(); i++) {
+				AllRtNum += message.get(i).getForwardnum();
+			}
+			for (int i = 0; i < message.size(); i++) {
+				pst.setString(1, message.get(i).getFirstuser());
+				pst.setString(2, message.get(i).getTitle());
+				pst.setInt(3, message.get(i).getForwardnum());
+				pst.setInt(4, 100);
+				pst.setDate(5, new java.sql.Date(message.get(i).getStart_time().getTime()));
+				pst.setFloat(6, (float) message.get(i).getForwardnum()/AllRtNum);
+				
 				// 把一个SQL命令加入命令列表  
 			    pst.addBatch();
 			}
@@ -237,6 +291,56 @@ public final class UserDAO {
 		}
 		return true;
 	}
+	
+	public boolean insertRetweetTrend(Vector<Content> message) throws ClassNotFoundException{
+		
+		Connection con = null ;
+		PreparedStatement pst = null ;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/http_twitter130814?useUnicode=true&amp;characterEncoding=gb2312","root","ir@iie");
+			//con = DataAccess.getConnection();
+			pst = con.prepareStatement("delete from retweet_trend");
+			pst.executeUpdate();
+			
+			pst = con.prepareStatement("insert into retweet_trend(twitterID, tranNum, userNum, " +
+					"tOrig, tContent, tStartTime, tLastTime, keywords) values(?,?,?,?,?,?,?,?)");
+			for (int i = 0; i < message.size(); i++) {
+				pst.setInt(1, i+1);
+				pst.setInt(2, message.get(i).getForwardnum());
+				pst.setInt(3, message.get(i).getUsernum());
+				pst.setString(4, message.get(i).getFirstuser());
+				pst.setString(5, message.get(i).getTitle());
+				pst.setDate(6, new java.sql.Date(message.get(i).getStart_time().getTime()));
+				pst.setDate(7, new java.sql.Date(message.get(i).getEnd_time().getTime()));
+				pst.setString(8, "测试中...");
+				
+				// 把一个SQL命令加入命令列表  
+			    pst.addBatch();
+				
+				
+			}
+			
+			// 执行批量更新  
+			pst.executeBatch();
+		}catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		} finally{
+			try {
+				if(pst!=null){
+					pst.close();
+				}
+				if(con!=null){
+					con.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return true;
+	}
+	
 	
 	public List<User> findAll(){
 		Connection con = null ;

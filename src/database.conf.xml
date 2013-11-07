@@ -1,7 +1,7 @@
 <database-conf>
 <datasource>
 	<driver>com.mysql.jdbc.Driver</driver>
-	<url>jdbc:mysql://localhost:3306/http_twitter130814?useUnicode=true&amp;characterEncoding=gb2312</url>
+	<url>jdbc:mysql://localhost:3306/twitter_api_0424?useUnicode=true&amp;characterEncoding=gb2312</url>
 	<user>root</user>
 	<password>hadoop</password>
 </datasource>

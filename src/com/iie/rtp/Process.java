@@ -65,7 +65,7 @@ public final class Process {
 		ValueComparator bvc =  new ValueComparator(map);
         TreeMap<String, Integer> sortmap = new TreeMap<String,Integer>(bvc);
 
-        //System.out.println("Top " + K + "排序:");
+        /*System.out.println("Top " + K + "排序:");*/
         sortmap.putAll(map);
         
 		int counter = 0 ;
@@ -76,7 +76,7 @@ public final class Process {
         		Map.Entry entry = (Map.Entry) iter.next(); 
                 Object key = entry.getKey(); 
                 Object val = entry.getValue(); 
-                //System.out.println(val + "\t" + key);
+                /*System.out.println(val + "\t" + key);*/
                 
                 Pattern pattern = Pattern.compile("\\((.*?)\\)");
                 Matcher matcher = pattern.matcher(key.toString());
@@ -112,8 +112,8 @@ public final class Process {
 		int usernum = 0;
 		if (clustercontent.size() != 0) {
 			for (int i = 0, size = clustercontent.size(); i < K && i < size; i++) {
-				/*System.out.println("转发数forwarnum = " + clustercontent.get(i).getForwardnum());
-				System.out.println("转发链: " + clustercontent.get(i).getRtlink());*/
+				System.out.println("转发数forwarnum = " + clustercontent.get(i).getForwardnum());
+				System.out.println("转发链: " + clustercontent.get(i).getRtlink());
 				
 				Pattern pattern = Pattern.compile("\\((.*?)\\)");
                 Matcher matcher = pattern.matcher(clustercontent.get(i).getRtlink());
@@ -128,7 +128,7 @@ public final class Process {
                 	}
                 }
                 
-                /*System.out.println("参与转发人数： " + usernum);*/   
+                System.out.println("参与转发人数： " + usernum);   
 				
                 List<Date> list = new ArrayList<Date>();
                 String strcon = null;
@@ -139,7 +139,7 @@ public final class Process {
 				    Map.Entry entry = (Map.Entry) iter.next(); 
 				    Object key = entry.getKey(); 
 				    Object val = entry.getValue(); 
-				    /*System.out.println(key + "\t" + sdf.format(val));*/
+				    System.out.println(key + "\t" + sdf.format(val));
 				    
 				    if (strcon == null) {
 				    	strcon = key.toString();
@@ -160,7 +160,7 @@ public final class Process {
                 list = new ArrayList<Date>();
 		        strcon = null;
                 
-				/*System.out.println("");*/
+				System.out.println("");
 			}
 		}	
 		

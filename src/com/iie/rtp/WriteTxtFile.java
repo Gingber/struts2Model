@@ -106,22 +106,27 @@ public final class WriteTxtFile {
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
-		String SqlDefinition = "DROP TABLE IF EXISTS `toptwitter_twitter_201309096_10_1_Ginger`;\n\n" +
-		"CREATE TABLE `toptwitter_twitter_201309096_10_1_Ginger` (\n" +
-		"`twitterID` int(11) NOT NULL,\n" +
-		"`tranNum` int(11) DEFAULT NULL,\n" +
-		"`uerNum` int(11) DEFAULT NULL,\n" +
-		"`tOrig` varchar(45) DEFAULT NULL,\n" +
-		"`tContent` varchar(300) DEFAULT NULL,\n" +
-		"`tStartTime` datetime DEFAULT NULL,\n" +
-		"`tLastTime` datetime DEFAULT NULL,\n" +
-		"PRIMARY KEY (`twitterID`)\n" +
+		int AllRtNum = 0;
+		for (int i = 0; i < message.size(); i++) {
+			AllRtNum += message.get(i).getForwardnum();
+		}
+		
+		String SqlDefinition = "DROP TABLE IF EXISTS `hot_tweet`;\n\n" +
+		"CREATE TABLE `hot_tweet` (\n" +
+		"`userName` varchar(255) CHARACTER SET utf8 DEFAULT NULL,\n" +
+		"`Retweet` text CHARACTER SET utf8,\n" +
+		"`Forward` bigint(16) DEFAULT NULL,\n" +
+		"`Friends` bigint(16) DEFAULT NULL,\n" +
+		"`Create_Time` datetime DEFAULT NULL,\n" +
+		"`Popularity` float DEFAULT NULL,\n" +
+		"`other1` varchar(255) CHARACTER SET utf8 DEFAULT NULL,\n" +
+		"`other2` varchar(255) CHARACTER SET utf8 DEFAULT NULL\n" +
 		") ENGINE=InnoDB DEFAULT CHARSET=utf8;\n\n" +
-		"LOCK TABLES `toptwitter_twitter_201309096_10_1_Ginger` WRITE;\n\n";
+		"LOCK TABLES `hot_tweet` WRITE;\n\n";
 		
 		FileWriter(SqlDefinition);
 		
-		String SqlInsert = "INSERT INTO `toptwitter_twitter_201309096_10_1_Ginger` VALUES (";
+		String SqlInsert = "INSERT INTO `hot_tweet` VALUES (";
 		
 		for (int i = 0; i < message.size(); i++) {
 			System.out.println( "'" + message.get(i).getForwardnum() + "'," + 
@@ -131,19 +136,17 @@ public final class WriteTxtFile {
 								"'" + message.get(i).getStart_time() + "'," +
 								"'" + message.get(i).getEnd_time() + "'");
 			// 写入文件(提供给陈学敏展示数据)
-			FileWriter(SqlInsert + (i+1) + "," +
+			FileWriter("'" + message.get(i).getFirstuser() + "'," +
+					"'" + message.get(i).getTitle() + "'," +
 					+ message.get(i).getForwardnum() + "," + 
-					+ message.get(i).getUsernum() + "," +
-					"'" + message.get(i).getFirstuser() + "'," + 
-					"'" + message.get(i).getTitle() + "'," + 
+					+ 100 + "," + 
 					"'" + sdf.format(message.get(i).getStart_time()) + "'," +
-					"'" + sdf.format(message.get(i).getEnd_time()) + "');\n");
+					+ message.get(i).getForwardnum()*1.0/AllRtNum +
+					")" + "\n");
 		}
-
 		FileWriter("\nUNLOCK TABLES;");
 		
 		return true;
-		
 	}
 
 }
