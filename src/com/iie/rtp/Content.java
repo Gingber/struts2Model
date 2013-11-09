@@ -8,8 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import com.arthur.simhash.SimHash;
-
 /**
  * @author hadoop
  *
@@ -19,7 +17,7 @@ public class Content {
 	private String messageId;
 	private String userId;
 	private String title;
-	private SimHash hash;
+	private int fingerprint;
 	private Date create_time;
 	private int num;	// 消息编号
 	private int forwardnum;	// 转发数
@@ -41,12 +39,12 @@ public class Content {
 	 * @param create_time
 	 */
 	public Content(String messageId, String userId, String title,
-			SimHash hash, Date create_time) {
+			int fingerprint, Date create_time) {
 		super();
 		this.messageId = messageId;
 		this.userId = userId;
 		this.title = title;
-		this.hash = hash;
+		this.fingerprint = fingerprint;
 		this.create_time = create_time;
 	}
 	/**
@@ -219,14 +217,14 @@ public class Content {
 	/**
 	 * @return the fingerprint
 	 */
-	public SimHash getHash() {
-		return hash;
+	public int getFingerprint() {
+		return fingerprint;
 	}
 	/**
 	 * @param fingerprint the fingerprint to set
 	 */
-	public void setHash(SimHash hash) {
-		this.hash = hash;
+	public void setFingerprint(int fingerprint) {
+		this.fingerprint = fingerprint;
 	}
 	/**
 	 * @return the num

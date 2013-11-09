@@ -9,7 +9,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.arthur.simhash.SimHash;
-import com.arthur.simhash.SimHash1;
 import com.ascent.dao.UserDAO;
 import com.ascent.javabean.Message;
 import com.iie.statistics.KeyUserInfo;
@@ -27,9 +26,11 @@ public class Twitter {
 	/**
 	 * @param args
 	 * @throws ClassNotFoundException 
-	 * @throws Exception 
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
+	 * @throws ParseException 
 	 */
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException {
 		// TODO Auto-generated method stub
 		
 		long startTime1 = System.currentTimeMillis();   //获取开始时间
@@ -47,7 +48,7 @@ public class Twitter {
 		
 		urList.addAll(ud.findAllMessage());
 
-		SimHash1 simhash = new SimHash1();
+		SimHash simhash = new SimHash();
 		
 		Iterator<Message> itur = urList.iterator();
 		while (itur.hasNext()) {
@@ -56,10 +57,9 @@ public class Twitter {
 			//System.out.println(messageId);
 			String userId = urTemp.getUser_Name();
 			String title = urTemp.getTitle();
-			SimHash hash = new SimHash(title, 64); 
-			//int fingerprint = simhash.getHashCode(title);
+			int fingerprint = simhash.getHashCode(title);
 			Date createTime = urTemp.getCreate_time(); 
-			content = new Content(messageId, userId, title, hash, createTime);
+			content = new Content(messageId, userId, title, fingerprint, createTime);
 			AllContents.add(content);
 		}
 		

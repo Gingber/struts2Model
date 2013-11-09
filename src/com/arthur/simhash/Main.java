@@ -17,7 +17,7 @@ public class Main {
 		String str1 = "二奶干了卧底的活，网友干了侦探的活，微博干了媒体的活，干爹干了男友的活！ 。";
 		String str2 = "我是中国人, 我的中国心，草拟大爷， 美帝国主义，阿凡达上课，你发可能发生的";
 		
-		SimHash1 sim = new SimHash1();
+		SimHash sim = new SimHash();
 		//compare 6 and 8 for test.
 		//sim.compareString(String.valueOf(6), String.valueOf(8));
 		//System.out.println();

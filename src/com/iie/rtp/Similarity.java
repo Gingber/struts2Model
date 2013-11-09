@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 import java.io.*;
 
 import com.arthur.simhash.SimHash;
-import com.arthur.simhash.SimHash1;
 
 /**
  * @author Gingber
@@ -63,8 +62,8 @@ public class Similarity {
 		
 		long startTime1 = System.currentTimeMillis();   //获取开始时间
 
-		/*Comparator fgpcomp = new fgpComparatorImplementation();
-		Collections.sort(content, fgpcomp);*/
+		Comparator fgpcomp = new fgpComparatorImplementation();
+		Collections.sort(content, fgpcomp);
 		
 
 		int num = 1;
@@ -81,7 +80,7 @@ public class Similarity {
 					if (content.get(j).getNum() != 0) { // 此项已被编号，跳出被层循环，进入下一层循环
 						continue;
 					} else {
-			    		int d = content.get(i).getHash().hammingDistance(content.get(j).getHash());
+			    		int d = SimHash.getDistance(content.get(i).getFingerprint(), content.get(j).getFingerprint());
 			    		
 			    		//System.out.println(i + " -> " + j + "\t" + d);
 						if (d <= 3) { //相似度设置
@@ -133,7 +132,7 @@ public class Similarity {
 	}
 }
 
-/*class fgpComparatorImplementation implements Comparator<Content> {
+class fgpComparatorImplementation implements Comparator<Content> {
 	public int compare(Content s1,Content s2) {
 		int num1 = s1.getFingerprint();
 		int num2 = s2.getFingerprint();
@@ -145,5 +144,5 @@ public class Similarity {
 			return 0;
 		}
 	}
-}*/
+}
 
