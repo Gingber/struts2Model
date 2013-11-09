@@ -8,6 +8,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.arthur.simhash.SimHash;
+import com.arthur.simhash.SimHash1;
 import com.ascent.dao.UserDAO;
 import com.ascent.javabean.Message;
 import com.iie.statistics.KeyUserInfo;
@@ -25,11 +27,9 @@ public class Twitter {
 	/**
 	 * @param args
 	 * @throws ClassNotFoundException 
-	 * @throws IOException 
-	 * @throws ClassNotFoundException 
-	 * @throws ParseException 
+	 * @throws Exception 
 	 */
-	public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException {
+	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 		
 		long startTime1 = System.currentTimeMillis();   //获取开始时间
@@ -42,17 +42,24 @@ public class Twitter {
 		Vector<Content> AllContents = new Vector<Content>();
 		
 		urList = new ArrayList<Message>();
+		
+		//List<String> SenWordsList = ud.findSensitiveWords();
+		
 		urList.addAll(ud.findAllMessage());
 
-		Iterator itur = urList.iterator();
+		SimHash1 simhash = new SimHash1();
+		
+		Iterator<Message> itur = urList.iterator();
 		while (itur.hasNext()) {
 			Message urTemp = (Message) itur.next();
 			String messageId = urTemp.getMessage_id();
+			//System.out.println(messageId);
 			String userId = urTemp.getUser_Name();
 			String title = urTemp.getTitle();
+			SimHash hash = new SimHash(title, 64); 
+			//int fingerprint = simhash.getHashCode(title);
 			Date createTime = urTemp.getCreate_time(); 
-			
-			content = new Content(messageId, userId, title, createTime);
+			content = new Content(messageId, userId, title, hash, createTime);
 			AllContents.add(content);
 		}
 		
@@ -108,7 +115,7 @@ public class Twitter {
 		 */
 		Similarity sim = new Similarity();
 		Vector<Content> ClusterContent = sim.SimilarityCluster(AllContents);	// 相同或相似项进行编号， 并将编号由小到大进行排序
-		
+		int cluster  = ClusterContent.get(ClusterContent.size()-1).getNum();		
 		long endTime2 = System.currentTimeMillis();
 		System.out.println("数据相似度计算时间： "+ (endTime2-startTime2) +"ms");
 		
@@ -123,7 +130,7 @@ public class Twitter {
 		/**
 		 * 提供接口
 		 */
-		int K = 10;
+		int K = 50;
 		Process proc = new Process();
 		List<String> username = proc.TopKUserName(RtContent, K);
 		Vector<Content> message = proc.TopKMessage(RtContent, K); 

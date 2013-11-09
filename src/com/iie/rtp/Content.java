@@ -3,9 +3,12 @@
  */
 package com.iie.rtp;
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import com.arthur.simhash.SimHash;
 
 /**
  * @author hadoop
@@ -16,6 +19,7 @@ public class Content {
 	private String messageId;
 	private String userId;
 	private String title;
+	private SimHash hash;
 	private Date create_time;
 	private int num;	// 消息编号
 	private int forwardnum;	// 转发数
@@ -26,59 +30,24 @@ public class Content {
 	private Date start_time;
 	private Date end_time;
 	
+	
+	
+	
 	/**
-	 * @return the firstuser
-	 */
-	public String getFirstuser() {
-		return firstuser;
-	}
-	/**
+	 * @param messageId
+	 * @param userId
 	 * @param title
-	 * @param forwardnum
-	 * @param usernum
-	 * @param firstuser
-	 * @param startTime
-	 * @param endTime
+	 * @param fingerprint
+	 * @param create_time
 	 */
-	public Content(int forwardnum, int usernum, String firstuser, String title,
-			Date startTime, Date endTime) {
+	public Content(String messageId, String userId, String title,
+			SimHash hash, Date create_time) {
 		super();
+		this.messageId = messageId;
+		this.userId = userId;
 		this.title = title;
-		this.forwardnum = forwardnum;
-		this.usernum = usernum;
-		this.firstuser = firstuser;
-		this.start_time = startTime;
-		this.end_time = endTime;
-	}
-	/**
-	 * @param firstuser the firstuser to set
-	 */
-	public void setFirstuser(String firstuser) {
-		this.firstuser = firstuser;
-	}
-	/**
-	 * @return the start_time
-	 */
-	public Date getStart_time() {
-		return start_time;
-	}
-	/**
-	 * @param startTime the start_time to set
-	 */
-	public void setStart_time(Date startTime) {
-		start_time = startTime;
-	}
-	/**
-	 * @return the end_time
-	 */
-	public Date getEnd_time() {
-		return end_time;
-	}
-	/**
-	 * @param endTime the end_time to set
-	 */
-	public void setEnd_time(Date endTime) {
-		end_time = endTime;
+		this.hash = hash;
+		this.create_time = create_time;
 	}
 	/**
 	 * @param title
@@ -158,6 +127,60 @@ public class Content {
 		this.create_time = createTime;
 	}
 	/**
+	 * @param title
+	 * @param forwardnum
+	 * @param usernum
+	 * @param firstuser
+	 * @param startTime
+	 * @param endTime
+	 */
+	public Content(int forwardnum, int usernum, String firstuser, String title,
+			Date startTime, Date endTime) {
+		super();
+		this.title = title;
+		this.forwardnum = forwardnum;
+		this.usernum = usernum;
+		this.firstuser = firstuser;
+		this.start_time = startTime;
+		this.end_time = endTime;
+	}
+	/**
+	 * @return the firstuser
+	 */
+	public String getFirstuser() {
+		return firstuser;
+	}
+	/**
+	 * @param firstuser the firstuser to set
+	 */
+	public void setFirstuser(String firstuser) {
+		this.firstuser = firstuser;
+	}
+	/**
+	 * @return the start_time
+	 */
+	public Date getStart_time() {
+		return start_time;
+	}
+	/**
+	 * @param startTime the start_time to set
+	 */
+	public void setStart_time(Date startTime) {
+		start_time = startTime;
+	}
+	/**
+	 * @return the end_time
+	 */
+	public Date getEnd_time() {
+		return end_time;
+	}
+	/**
+	 * @param endTime the end_time to set
+	 */
+	public void setEnd_time(Date endTime) {
+		end_time = endTime;
+	}
+	/**
 	 * @return the userId
 	 */
 	public String getUserId() {
@@ -193,7 +216,18 @@ public class Content {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
+	/**
+	 * @return the fingerprint
+	 */
+	public SimHash getHash() {
+		return hash;
+	}
+	/**
+	 * @param fingerprint the fingerprint to set
+	 */
+	public void setHash(SimHash hash) {
+		this.hash = hash;
+	}
 	/**
 	 * @return the num
 	 */

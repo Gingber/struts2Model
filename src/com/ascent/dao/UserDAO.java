@@ -3,25 +3,27 @@
  */
 package com.ascent.dao;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.ascent.javabean.Message;
 import com.ascent.javabean.User;
 import com.ascent.util.DataAccess;
+import com.ascent.util.TxtReader;
 import com.iie.rtp.Content;
 
 /**
@@ -162,32 +164,99 @@ public final class UserDAO {
      }
 	 
 	 //<<<<<<<---------------------时间格式统一处理模块--------------------->>>>>>>>>>>>>
+	 
+	 public List<String> findSensitiveWords() throws ClassNotFoundException, ParseException{
+		Connection con = null ;
+		PreparedStatement pst = null ;
+		ResultSet rs = null ;
+		List<String> SenWordsList = new ArrayList<String>();
+		//敏感词表
+		String SensitiveWords = "民主 人權 人权 自由 改革 選舉 选举 多黨 多党 平反 獨裁 独裁 法西斯 專政 专政 專制 专制 反共 反黨 反党 反革命 反動  " +
+				"反动 共匪 共惨党 群體滅絕 群体灭绝 鎮壓 镇压 推翻 政變 政变 打倒 維權 维权 封鎖 封锁 勞教 劳教 紅色恐佈 红色恐怖 邪惡 邪恶 流亡 红色的法拉利 " +
+				"六四 天安門事件 天安门事件 民運 民運 疆獨 疆独 藏獨 藏独 達賴 达赖 江澤民 江泽民 江賊 江贼  賊民 贼民 江賊民 江流氓  法輪 法轮 法倫 法伦 輪功 轮功 輪大 轮大 大法 洪志 弟子 真善忍 明慧 " +
+				"民進黨 民进党 臺灣團結聯盟 台湾团结联盟 泛綠 泛绿 中華民國 中华民国 臺獨 台独 國民黨 国民党 泛藍 泛蓝 陳水扁 陈水扁  呂秀蓮 吕秀莲 李登輝 李登辉 宋美齡 宋美龄 蔣經國 蒋经国 蔣方良 蒋方良 馬英九 马英九";
+		String[] SenWordsArr = SensitiveWords.split(" ");
+		
+		for(int i  = 0; i < SenWordsArr.length; i++) {
+			if(!SenWordsList.contains(SenWordsArr[i]))
+				SenWordsList.add(SenWordsArr[i]);
+		}
+		
+		/*try {
+			con = DataAccess.getConnection();
+			pst = con.prepareStatement("SELECT TaskParameter2 FROM inputtask");
+			rs = pst.executeQuery();
+			while(rs.next()){
+				String[] SenUserArr = rs.getString("TaskParameter2").split(" ");
+				for(int i  = 0; i < SenUserArr.length; i++) {
+					if(!SenUserList.contains(SenUserArr[i]))
+						SenUserList.add(SenUserArr[i]);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally{
+			try {
+				if(pst!=null){
+					pst.close();
+				}
+				if(con!=null){
+					con.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}*/
+		
+		return SenWordsList;
+	 }
 	
-	public List<Message> findAllMessage() throws ClassNotFoundException, ParseException{
+	public List<Message> findAllMessage() throws ClassNotFoundException, ParseException, IOException{
 		Connection con = null ;
 		PreparedStatement pst = null ;
 		ResultSet rs = null ;
 		Message message = null ;
 		List<Message> messages = new ArrayList<Message>();
 		
-		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+		
+		List<String> SensitiveWords = TxtReader.loadVectorFromFile(new File("file/sw.txt"), "utf-8");
 		
 		try {
 			con = DataAccess.getConnection();
-			pst = con.prepareStatement("SELECT message_id, title, user_id, create_time FROM message Limit 0, 100000");
+			/*pst = con.prepareStatement("CREATE INDEX idxMTUC ON message (message_id, title, user_id, create_time)");
+			pst.executeUpdate();*/
+			
+			pst = con.prepareStatement("SELECT message_id, title, user_id, create_time FROM message LIMIT 0, 3000000");
 			rs = pst.executeQuery();
 			while(rs.next()){
-				String message_id = rs.getString("message_id");
+				String title= rs.getString("title");
+				if (isChinese(title) > 10) {
+					for (int i = 0; i < SensitiveWords.size(); i++) {
+						if (title.contains(SensitiveWords.get(i))) {
+							String message_id = rs.getString("message_id");
+							String user_name = rs.getString("user_id");
+							Date create_time = rs.getTimestamp("create_time");
+							
+							message = new Message(message_id, title, user_name, create_time);
+							messages.add(message);
+							
+							continue;
+						}
+					}
+				}
+				
+				/*String message_id = rs.getString("message_id");
 				String user_name = rs.getString("user_id");
 				Date create_time = rs.getTimestamp("create_time");
-				/*String create_time = rs.getString("create_time").toString();
+				String create_time = rs.getString("create_time").toString();
 				String NormTime = NormTimeFormat(create_time);
-				Date ProTime = sdf.parse(NormTime);*/
+				Date ProTime = sdf.parse(NormTime);
 				String title= rs.getString("title");
-				if (isChinese(title) > 10){
+				if (isChinese(title) > 10) {
 					message = new Message(message_id, title, user_name, create_time);
 					messages.add(message);
-				}	
+				}*/
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -212,7 +281,7 @@ public final class UserDAO {
 		PreparedStatement pst = null ;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/twitter_api_0424?useUnicode=true&amp;characterEncoding=gb2312","root","hadoop");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/twitter_api_0424?user=root&password=hadoop&useUnicode=true&characterEncoding=utf-8");
 			//con = DataAccess.getConnection();
 			pst = con.prepareStatement("delete from usertop");
 			pst.executeUpdate();
@@ -248,9 +317,9 @@ public final class UserDAO {
 		
 		Connection con = null ;
 		PreparedStatement pst = null ;
-		try {
+		try { 
 			Class.forName("com.mysql.jdbc.Driver");
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/twitter_api_0424?useUnicode=true&amp;characterEncoding=gb2312","root","hadoop");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/twitter_api_0424?user=root&password=hadoop&useUnicode=true&characterEncoding=utf-8");
 			//con = DataAccess.getConnection();
 			pst = con.prepareStatement("delete from hot_tweet");
 			pst.executeUpdate();
@@ -265,7 +334,7 @@ public final class UserDAO {
 				pst.setString(2, message.get(i).getTitle());
 				pst.setInt(3, message.get(i).getForwardnum());
 				pst.setInt(4, 100);
-				pst.setDate(5, new java.sql.Date(message.get(i).getStart_time().getTime()));
+				pst.setTimestamp(5, new Timestamp(message.get(i).getStart_time().getTime()));
 				pst.setFloat(6, (float) message.get(i).getForwardnum()/AllRtNum);
 				
 				// 把一个SQL命令加入命令列表  
@@ -298,7 +367,7 @@ public final class UserDAO {
 		PreparedStatement pst = null ;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/http_twitter130814?useUnicode=true&amp;characterEncoding=gb2312","root","ir@iie");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/twitter_api_0424?user=root&password=hadoop&useUnicode=true&characterEncoding=utf-8");
 			//con = DataAccess.getConnection();
 			pst = con.prepareStatement("delete from retweet_trend");
 			pst.executeUpdate();
@@ -311,8 +380,8 @@ public final class UserDAO {
 				pst.setInt(3, message.get(i).getUsernum());
 				pst.setString(4, message.get(i).getFirstuser());
 				pst.setString(5, message.get(i).getTitle());
-				pst.setDate(6, new java.sql.Date(message.get(i).getStart_time().getTime()));
-				pst.setDate(7, new java.sql.Date(message.get(i).getEnd_time().getTime()));
+				pst.setTimestamp(6, new Timestamp(message.get(i).getStart_time().getTime()));
+				pst.setTimestamp(7, new Timestamp(message.get(i).getEnd_time().getTime()));
 				pst.setString(8, "测试中...");
 				
 				// 把一个SQL命令加入命令列表  
